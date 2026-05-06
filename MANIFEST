@@ -80,6 +80,7 @@ lib/XML/LibXML/ErrNo.pod
 lib/XML/LibXML/Error.pm
 lib/XML/LibXML/Error.pod
 lib/XML/LibXML/InputCallback.pod
+lib/XML/LibXML/NamedNodeMap.pod
 lib/XML/LibXML/Literal.pm
 lib/XML/LibXML/Namespace.pod
 lib/XML/LibXML/Node.pod
