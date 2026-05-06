@@ -45,6 +45,7 @@ example/dtd.xml
 example/enc2_latin2.html
 example/enc_latin2.html
 example/ext_ent.dtd
+example/hello-world.pl
 example/ns.xml
 example/test.dtd
 example/test.html

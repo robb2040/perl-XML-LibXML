@@ -132,6 +132,7 @@ use XML::LibXML;
         ],
     );
     $doc->setDocumentElement( $html );
+    $doc->createInternalSubset( "html", (undef) x 2 );
 
     print $doc->toStringHTML();
 }
