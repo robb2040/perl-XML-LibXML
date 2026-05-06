@@ -1,3 +1,4 @@
+#include "ppport.h"
 /**
  * perl-libxml-sax.h
  * $Id$

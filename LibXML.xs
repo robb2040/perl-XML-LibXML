@@ -4825,7 +4825,7 @@ replaceChild( self, nNode, oNode )
     PREINIT:
         xmlNodePtr ret = NULL;
     CODE:
-        // if newNode == oldNode or self == newNode then do nothing, just return nNode.
+        /* if newNode == oldNode or self == newNode then do nothing, just return nNode. */
         if (nNode == oNode || self == nNode ) {
             ret = nNode;
             RETVAL = PmmNodeToSv(ret, PmmOWNERPO(PmmPROXYNODE(ret)));
