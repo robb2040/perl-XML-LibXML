@@ -1,4 +1,3 @@
-#include "ppport.h"
 /**
  * perl-libxml-mm.h
  * $Id$
