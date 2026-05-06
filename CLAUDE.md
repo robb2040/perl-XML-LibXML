@@ -84,8 +84,14 @@ libxml2                           (system C library)
 - Avoid trailing statement modifiers
 
 ### General
-- Update `MANIFEST` and `Changes` for all changes
 - External DTD/entity loading is disabled by default (security)
+
+## Contributing Guidelines
+
+- All changes **must pass CI** before being submitted
+- Keep changes **focused on the requested fix** — do not add unrelated cleanup, refactoring, or scope expansion
+- Do **not** re-sort `MANIFEST` — the file order is maintained by `make manifest`
+- Do **not** bump the version number or modify `Changes` — versioning and changelog updates are part of the release process
 
 ## CI
 
