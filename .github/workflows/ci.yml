@@ -250,7 +250,7 @@ jobs:
 
           - name: openbsd
             version: '7.6'
-            pkginstall: pkg_add libxml2
+            pkginstall: pkg_add libxml
 
           - name: netbsd
             version: '10.1'
@@ -270,7 +270,7 @@ jobs:
           run: |
             sudo ${{ matrix.os.pkginstall }}
             pkg-config --modversion libxml-2.0 2>/dev/null || xml2-config --version 2>/dev/null || true
-            curl -L https://cpanmin.us | sudo perl - --notest --installdeps --with-configure .
+            curl -L https://cpanmin.us | sudo perl - --notest Alien::Libxml2 XML::NamespaceSupport XML::SAX XML::SAX::Base
             perl Makefile.PL
             make
             prove -wlvmb t
