@@ -1536,7 +1536,7 @@ PmmSaxError(void * ctx, const char * msg, ...)
     SV * svMessage;
 
 #if LIBXML_VERSION > 20600
-    xmlErrorPtr last_err = xmlCtxtGetLastError( ctxt );
+    const xmlError *last_err = xmlCtxtGetLastError( ctxt );
 #endif
     dTHX;
     dSP;
