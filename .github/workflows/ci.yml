@@ -250,9 +250,11 @@ jobs:
             version: '14.2'
             pkginstall: pkg install -y libxml2 pkgconf p5-ExtUtils-MakeMaker
 
-          - name: openbsd
-            version: '7.6'
-            pkginstall: pkg_add libxml
+          # OpenBSD 7.6 disabled — CI runner unreliable.
+          # See tracking issue to re-enable when stable.
+          # - name: openbsd
+          #   version: '7.6'
+          #   pkginstall: pkg_add libxml
 
           - name: netbsd
             version: '10.1'
