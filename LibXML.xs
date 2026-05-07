@@ -2843,6 +2843,13 @@ _default_catalog( self, catalog )
     OUTPUT:
         RETVAL
 
+# Set or clear the global external entity loader callback.
+# When called with a coderef: saves the current libxml2 loader, installs
+# LibXML_load_external_entity as the global loader, and stores the Perl
+# callback in EXTERNAL_ENTITY_LOADER_FUNC (freeing any previous one).
+# When called with undef: decrefs the stored callback, restores the
+# original libxml2 loader, and NULLs both global tracking variables.
+# Always returns a copy of the previous Perl callback (or undef).
 SV*
 _externalEntityLoader( loader )
         SV* loader
