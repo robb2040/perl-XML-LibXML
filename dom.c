@@ -198,7 +198,9 @@ _domReconcileNs(xmlNodePtr tree, xmlNsPtr * unused)
                         {
                                 /* Restart the namespace at this point */
                                 tree->ns = xmlCopyNamespace(tree->ns);
-                                domAddNsDef(tree, tree->ns);
+                                if (tree->ns) {
+                                    domAddNsDef(tree, tree->ns);
+                                }
                         }
                 }
         }
