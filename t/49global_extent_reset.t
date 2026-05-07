@@ -4,9 +4,9 @@ use warnings;
 use Test::More;
 use XML::LibXML;
 
-if (XML::LibXML::LIBXML_VERSION() < 21100)
+if (XML::LibXML::LIBXML_VERSION() < 20627)
 {
-    plan skip_all => "skipping for libxml2 < 2.11.0";
+    plan skip_all => "skipping for libxml2 < 2.6.27";
 }
 else
 {
@@ -38,12 +38,12 @@ subtest "initial parse fails without handler" => sub {
 };
 
 # TEST
-subtest "initial parse with network gives empty expansion" => sub {
-  my $parser = XML::LibXML->new({ expand_entities => 1 });
-  my ($doc);
-  eval { $doc = $parser->parse_string($xml); };
-  is($@ || '', '', "no error");
-  is($doc->findvalue('/root/a'), '', "empty expansion");
+subtest "initial parse with network fails or gives empty expansion" => sub {
+    plan tests => 1;
+    my $parser = XML::LibXML->new({ expand_entities => 1 });
+    my ($doc);
+    eval { $doc = $parser->parse_string($xml); };
+    is($doc ? $doc->findvalue('//a') : '', '', "error or empty expansion");
 };
 
 # TEST

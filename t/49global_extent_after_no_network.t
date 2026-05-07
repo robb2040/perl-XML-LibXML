@@ -4,9 +4,9 @@ use warnings;
 use Test::More;
 use XML::LibXML;
 
-if (XML::LibXML::LIBXML_VERSION() < 21100)
+if (XML::LibXML::LIBXML_VERSION() < 20627)
 {
-    plan skip_all => "skipping for libxml2 < 2.11.0";
+    plan skip_all => "skipping for libxml2 < 2.6.27";
 }
 else
 {
