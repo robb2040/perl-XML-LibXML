@@ -28,7 +28,7 @@ in 1.67.
 # Dependencies
 
 Prior to installation you MUST have installed the libxml2 library. You can get
-the latest libxml2 version from <http://xmlsoft.org/>.
+the latest libxml2 version from <https://gitlab.gnome.org/GNOME/libxml2>.
 
 Without libxml2 installed this module will neither build nor run.
 
@@ -127,62 +127,19 @@ Full linking information for libxml2 can be obtained by invoking
 
 # Notes for Microsoft Windows
 
-Thanks to Randy Kobes there is a pre-compiled PPM package available on
-<http://theoryx5.uwinnipeg.ca/ppmpackages/>.
+On Windows, the recommended way to install XML::LibXML is via
+[Strawberry Perl](https://strawberryperl.com/), which ships with a working
+toolchain and pulls in libxml2 automatically through `Alien::Libxml2`.
 
-Usually it takes a little time to build the package for the latest release.
-
-If you want to build XML::LibXML on Windows from source, you can use the
-following instructions contributed by Christopher J. Madsen:
-
-These instructions assume that you already have your system set up to compile
-modules that use C components.
-
-First, get the libxml2 binaries from <http://xmlsoft.org/sources/win32/>
-(currently also available at <http://www.zlatkovic.com/pub/libxml/>).
-
-You need:
-
-- `iconv-VERSION.win32.zip`
-- `libxml2-VERSION.win32.zip`
-- `zlib-VERSION.win32.zip`
-
-Download the latest version of each. (Each package will probably have a
-different version.) When you extract them, you'll get directories named
-`iconv-VERSION.win32`, `libxml2-VERSION.win32`, and `zlib-VERSION.win32`, each
-containing `bin`, `lib`, and `include` directories.
-
-Combine all the `bin`, `include`, and `lib` directories under `c:\Prog\LibXML`.
-(You can use any directory you prefer; just adjust the instructions accordingly.)
-
-Get the latest version of XML-LibXML from CPAN. Extract it.
-
-Issue these commands in the `XML-LibXML-VERSION` directory:
-
-```sh
-perl Makefile.PL INC=-Ic:\Prog\LibXML\include LIBS=-Lc:\Prog\LibXML\lib
-nmake
-copy c:\Prog\LibXML\bin\*.dll blib\arch\auto\XML\LibXML
-nmake test
-nmake install
-```
-
-(Note: Some systems use `dmake` instead of `nmake`.)
-
-By copying the libxml2 DLLs to the arch directory, you help avoid conflicts
-with other programs you may have installed that use other (possibly
-incompatible) versions of those DLLs.
+If you need to build against a custom libxml2, pre-built Windows binaries are
+available from <https://www.zlatkovic.com/pub/libxml/>.
 
 
-# Notes for Mac OS X
+# Notes for macOS
 
-Due to a refactoring of the module, XML::LibXML will not run with some earlier
-versions of Mac OS X. It appears that this is related to special linker options
-for that OS prior to version 10.2.2. Since the developers do not have full
-access to this OS, help/patches from OS X gurus are highly appreciated.
-
-It is confirmed that XML::LibXML builds and runs without problems since Mac OS
-X 10.2.6.
+XML::LibXML builds and runs on supported versions of macOS. libxml2 is
+generally available either via the system, [Homebrew](https://brew.sh/)
+(`brew install libxml2`), or installed automatically by `Alien::Libxml2`.
 
 
 # Notes for HPUX
@@ -233,28 +190,21 @@ Additionally I received the following Note from Rozi Kovesdi:
 
 # Contact
 
-For bug reports, please use the issue tracker at
-<https://github.com/shlomif/perl-XML-LibXML/issues>.
-
-For suggestions etc. you may contact the maintainer directly at
-<https://www.shlomifish.org/me/contact-me/>, but in general, it is recommended
-to use the mailing list given below.
-
-For suggestions etc., and other issues related to XML::LibXML you may use the
-perl XML mailing list (perl-xml@listserv.ActiveState.com), where most
-XML-related Perl modules are discussed. In case of problems you should check
-the archives of that list first. Many problems are already discussed there. You
-can find the list's archives and subscription options at
-<http://aspn.activestate.com/ASPN/Mail/Browse/Threaded/perl-xml>.
+For bug reports and pull requests, please use the issue tracker at
+<https://github.com/cpan-authors/XML-LibXML/issues>.
 
 
 # Package History
 
-- Version < 0.98 were maintained by Matt Sergeant
-- 0.98 > Version > 1.49 were maintained by Matt Sergeant and Christian Glahn
-- Versions >= 1.49 are maintained by Christian Glahn
-- Versions > 1.56 are co-maintained by Petr Pajas
-- Versions >= 1.59 are provisionally maintained by Petr Pajas
+- Versions < 0.98 were maintained by Matt Sergeant
+- Versions 0.98 – 1.49 were maintained by Matt Sergeant and Christian Glahn
+- Versions 1.49 – 1.56 were maintained by Christian Glahn
+- Versions 1.56 – 1.58 were co-maintained by Petr Pajas
+- Versions 1.59 onward were originally maintained by Petr Pajas
+- Subsequently maintained for many years by Shlomi Fish
+  (last release: 2.0210, January 2024)
+- Now maintained by the cpan-authors team at
+  <https://github.com/cpan-authors/XML-LibXML>
 
 
 # Patches and Developer Version
@@ -264,7 +214,7 @@ you find a bug in the current release, make sure this bug still exists in the
 developer version of XML::LibXML. This version can be cloned from its Git
 repository. For more information about that, see:
 
-<https://github.com/shlomif/perl-XML-LibXML>
+<https://github.com/cpan-authors/XML-LibXML>
 
 Please consider all regression tests as correct. If any test fails it is most
 certainly related to a bug.
