@@ -451,7 +451,7 @@ sub createDocument {
 # callback functions                                                      #
 #-------------------------------------------------------------------------#
 
-sub externalEntityLoader(&)
+sub externalEntityLoader
 {
     return _externalEntityLoader($_[0]);
 }

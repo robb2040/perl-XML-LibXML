@@ -155,6 +155,22 @@ static xmlExternalEntityLoader LibXML_old_ext_ent_loader = NULL;
 /* global external entity loader */
 SV *EXTERNAL_ENTITY_LOADER_FUNC = (SV *)NULL;
 
+static int
+LibXML_is_network_uri(const char *URL)
+{
+    if (URL == NULL)
+    {
+        return 0;
+    }
+    if (xmlStrncmp(BAD_CAST URL, BAD_CAST "http://", 7) == 0 ||
+        xmlStrncmp(BAD_CAST URL, BAD_CAST "https://", 8) == 0 ||
+        xmlStrncmp(BAD_CAST URL, BAD_CAST "ftp://", 6) == 0)
+    {
+        return 1;
+    }
+    return 0;
+}
+
 SV* PROXY_NODE_REGISTRY_MUTEX = NULL;
 
 /* ****************************************************************
@@ -819,6 +835,15 @@ LibXML_load_external_entity(
     if (ctxt->_private == NULL && EXTERNAL_ENTITY_LOADER_FUNC == NULL)
     {
         return xmlNewInputFromFile(ctxt, URL);
+    }
+
+    if (ctxt != NULL && (ctxt->options & XML_PARSE_NONET) &&
+        LibXML_is_network_uri(URL))
+    {
+        xmlGenericError(xmlGenericErrorContext,
+            "Attempt to load network entity %s\n",
+            URL != NULL ? URL : "(null)");
+        return NULL;
     }
 
     if (URL == NULL) {
@@ -2821,16 +2846,38 @@ _externalEntityLoader( loader )
         SV* loader
     CODE:
         {
-            RETVAL = EXTERNAL_ENTITY_LOADER_FUNC;
-            if(EXTERNAL_ENTITY_LOADER_FUNC == NULL)
-            {
-                EXTERNAL_ENTITY_LOADER_FUNC = newSVsv(loader);
-            }
+            RETVAL = EXTERNAL_ENTITY_LOADER_FUNC
+                ? newSVsv(EXTERNAL_ENTITY_LOADER_FUNC)
+                : &PL_sv_undef;
 
-            if (LibXML_old_ext_ent_loader == NULL )
+            if (SvOK(loader))
             {
-                LibXML_old_ext_ent_loader = xmlGetExternalEntityLoader();
-                xmlSetExternalEntityLoader((xmlExternalEntityLoader)LibXML_load_external_entity);
+                if (EXTERNAL_ENTITY_LOADER_FUNC != NULL)
+                {
+                    SvREFCNT_dec(EXTERNAL_ENTITY_LOADER_FUNC);
+                }
+                EXTERNAL_ENTITY_LOADER_FUNC = newSVsv(loader);
+
+                if (LibXML_old_ext_ent_loader == NULL)
+                {
+                    LibXML_old_ext_ent_loader = xmlGetExternalEntityLoader();
+                }
+                xmlSetExternalEntityLoader(
+                    (xmlExternalEntityLoader)LibXML_load_external_entity);
+            }
+            else
+            {
+                if (EXTERNAL_ENTITY_LOADER_FUNC != NULL)
+                {
+                    SvREFCNT_dec(EXTERNAL_ENTITY_LOADER_FUNC);
+                    EXTERNAL_ENTITY_LOADER_FUNC = NULL;
+                }
+                if (LibXML_old_ext_ent_loader != NULL)
+                {
+                    xmlSetExternalEntityLoader(
+                        (xmlExternalEntityLoader)LibXML_old_ext_ent_loader);
+                    LibXML_old_ext_ent_loader = NULL;
+                }
             }
         }
     OUTPUT:
@@ -7374,14 +7421,14 @@ parse_location( self, url, parser_options = 0, recover = FALSE )
                                   saved_error );
 #endif
 
-        if ( EXTERNAL_ENTITY_LOADER_FUNC == NULL && (parser_options & XML_PARSE_NONET) ) {
+        if ( parser_options & XML_PARSE_NONET ) {
             old_ext_ent_loader = xmlGetExternalEntityLoader();
             xmlSetExternalEntityLoader( xmlNoNetExternalEntityLoader );
         }
 
         RETVAL = xmlRelaxNGParse( rngctxt );
 
-        if ( EXTERNAL_ENTITY_LOADER_FUNC == NULL && (parser_options & XML_PARSE_NONET) )
+        if ( parser_options & XML_PARSE_NONET )
             xmlSetExternalEntityLoader( (xmlExternalEntityLoader)old_ext_ent_loader );
 
         xmlRelaxNGFreeParserCtxt( rngctxt );
@@ -7423,14 +7470,14 @@ parse_buffer( self, perlstring, parser_options = 0, recover = FALSE )
                                   saved_error );
 #endif
 
-        if ( EXTERNAL_ENTITY_LOADER_FUNC == NULL && (parser_options & XML_PARSE_NONET) ) {
+        if ( parser_options & XML_PARSE_NONET ) {
             old_ext_ent_loader = xmlGetExternalEntityLoader();
             xmlSetExternalEntityLoader( xmlNoNetExternalEntityLoader );
         }
 
         RETVAL = xmlRelaxNGParse( rngctxt );
 
-        if ( EXTERNAL_ENTITY_LOADER_FUNC == NULL && (parser_options & XML_PARSE_NONET) )
+        if ( parser_options & XML_PARSE_NONET )
             xmlSetExternalEntityLoader( (xmlExternalEntityLoader)old_ext_ent_loader );
 
         xmlRelaxNGFreeParserCtxt( rngctxt );
@@ -7465,14 +7512,14 @@ parse_document( self, doc, parser_options = 0, recover = FALSE )
                                   saved_error );
 #endif
 
-        if ( EXTERNAL_ENTITY_LOADER_FUNC == NULL && (parser_options & XML_PARSE_NONET) ) {
+        if ( parser_options & XML_PARSE_NONET ) {
             old_ext_ent_loader = xmlGetExternalEntityLoader();
             xmlSetExternalEntityLoader( xmlNoNetExternalEntityLoader );
         }
 
         RETVAL = xmlRelaxNGParse( rngctxt );
 
-        if ( EXTERNAL_ENTITY_LOADER_FUNC == NULL && (parser_options & XML_PARSE_NONET) )
+        if ( parser_options & XML_PARSE_NONET )
             xmlSetExternalEntityLoader( (xmlExternalEntityLoader)old_ext_ent_loader );
 
         xmlRelaxNGFreeParserCtxt( rngctxt );
@@ -7564,14 +7611,14 @@ parse_location( self, url, parser_options = 0, recover = FALSE )
                                   (xmlSchemaValidityWarningFunc)LibXML_error_handler_ctx,
                                   saved_error );
 
-        if ( EXTERNAL_ENTITY_LOADER_FUNC == NULL && (parser_options & XML_PARSE_NONET) ) {
+        if ( parser_options & XML_PARSE_NONET ) {
             old_ext_ent_loader = xmlGetExternalEntityLoader();
             xmlSetExternalEntityLoader( xmlNoNetExternalEntityLoader );
         }
 
         RETVAL = xmlSchemaParse( rngctxt );
 
-        if ( EXTERNAL_ENTITY_LOADER_FUNC == NULL && (parser_options & XML_PARSE_NONET) )
+        if ( parser_options & XML_PARSE_NONET )
             xmlSetExternalEntityLoader( (xmlExternalEntityLoader)old_ext_ent_loader );
 
         xmlSchemaFreeParserCtxt( rngctxt );
@@ -7614,14 +7661,14 @@ parse_buffer( self, perlstring, parser_options = 0, recover = FALSE )
                                   (xmlSchemaValidityWarningFunc)LibXML_error_handler_ctx,
                                   saved_error );
 
-        if ( EXTERNAL_ENTITY_LOADER_FUNC == NULL && (parser_options & XML_PARSE_NONET) ) {
+        if ( parser_options & XML_PARSE_NONET ) {
             old_ext_ent_loader = xmlGetExternalEntityLoader();
             xmlSetExternalEntityLoader( xmlNoNetExternalEntityLoader );
         }
 
         RETVAL = xmlSchemaParse( rngctxt );
 
-        if ( EXTERNAL_ENTITY_LOADER_FUNC == NULL && (parser_options & XML_PARSE_NONET) )
+        if ( parser_options & XML_PARSE_NONET )
             xmlSetExternalEntityLoader( (xmlExternalEntityLoader)old_ext_ent_loader );
 
         xmlSchemaFreeParserCtxt( rngctxt );
