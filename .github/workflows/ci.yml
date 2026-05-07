@@ -36,8 +36,9 @@ jobs:
           args: "--with-develop"
       # author testing: build docs first, then re-run Makefile.PL
       - run: perl Makefile.PL
-      - run: "make docs ||:"
+      - run: "make -j$(nproc) docs ||:"
       - run: perl Makefile.PL
+      - run: make -j$(nproc)
       - run: make test
       - run: make disttest
 
@@ -83,7 +84,7 @@ jobs:
         run: |
           perl Makefile.PL OPTIMIZE="-g -O0 --coverage -fprofile-arcs -ftest-coverage" \
             LDDLFLAGS="-shared --coverage"
-          make
+          make -j$(nproc)
       - name: Run tests with Devel::Cover
         run: |
           HARNESS_PERL_SWITCHES="-MDevel::Cover=-coverage,statement,branch,condition,subroutine,+ignore,^t/" \
@@ -140,7 +141,7 @@ jobs:
         run: |
           perl Makefile.PL OPTIMIZE="-g -fsanitize=address -fno-omit-frame-pointer" \
             LDDLFLAGS="-shared -fsanitize=address"
-          make
+          make -j$(nproc)
       - name: Run tests under ASan
         run: |
           ASAN_LIB=$(gcc -print-file-name=libasan.so)
@@ -180,7 +181,7 @@ jobs:
       - name: Install XML-LibXML from checkout
         run: |
           perl Makefile.PL
-          make
+          make -j$(nproc)
           sudo make install
       - name: Test downstream module
         uses: perl-actions/install-with-cpm@v2
@@ -233,6 +234,7 @@ jobs:
           sudo: false
           cpanfile: ".github/cpanfile"
       - run: perl Makefile.PL
+      - run: make -j$(nproc)
       - run: make test
       - run: make install
 
@@ -303,7 +305,7 @@ jobs:
       - name: Makefile.PL
         run: perl Makefile.PL
       - name: make
-        run: make
+        run: make -j$(nproc)
       - name: make test
         run: make test
 
@@ -330,7 +332,7 @@ jobs:
           sudo: false
           cpanfile: ".github/cpanfile"
       - run: perl Makefile.PL
-      - run: make
+      - run: make -j$(sysctl -n hw.ncpu)
       - run: make test
 
   windows:
