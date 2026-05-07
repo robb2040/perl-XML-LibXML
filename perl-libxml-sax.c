@@ -153,14 +153,26 @@ int PSaxCharactersFlush(void *, struct CBuffer *);
 
 struct CBufferChunk * CBufferChunkNew(void) {
 	struct CBufferChunk *newchunk = xmlMalloc(sizeof(struct CBufferChunk));
+	dTHX;
+
+	if (newchunk == NULL) {
+		croak("Out of memory in SAX character buffering");
+	}
+
 	memset(newchunk, 0, sizeof(struct CBufferChunk));
 	return newchunk;
 }
 
 struct CBuffer * CBufferNew(void) {
 	struct CBuffer *new = xmlMalloc(sizeof(struct CBuffer));
-	struct CBufferChunk *newchunk = CBufferChunkNew();
+	struct CBufferChunk *newchunk;
+	dTHX;
 
+	if (new == NULL) {
+		croak("Out of memory in SAX character buffering");
+	}
+
+	newchunk = CBufferChunkNew();
 	memset(new, 0, sizeof(struct CBuffer));
 
 	new->head = newchunk;
@@ -237,6 +249,11 @@ int CBufferLength(struct CBuffer *buffer) {
 
 void CBufferAppend(struct CBuffer *buffer, const xmlChar *newstring, int len) {
 	xmlChar *copy = xmlMalloc(len);
+	dTHX;
+
+	if (copy == NULL) {
+		croak("Out of memory in SAX character buffering");
+	}
 
 	memcpy(copy, newstring, len);
 
@@ -260,6 +277,10 @@ xmlChar * CBufferCharacters(struct CBuffer *buffer) {
      *
      * */
 	dTHX;
+
+	if (new == NULL) {
+		croak("Out of memory in SAX character buffering");
+	}
 
 	if (buffer->head->data == NULL) {
 		return NULL;
