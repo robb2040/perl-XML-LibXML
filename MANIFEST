@@ -10,7 +10,6 @@ LibXML.xs
 MANIFEST
 Makefile.PL
 README.md
-TODO
 debian/changelog
 debian/compat
 debian/control
