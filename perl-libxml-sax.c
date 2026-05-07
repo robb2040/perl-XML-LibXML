@@ -1176,6 +1176,7 @@ int PSaxCharactersFlush (void *ctx, struct CBuffer *buffer) {
     PmmSAXVectorPtr sax = (PmmSAXVectorPtr)ctxt->_private;
     xmlChar *ch;
     int len;
+    int ret;
 
     if (buffer->head->data == NULL) {
         return 1;
@@ -1186,7 +1187,9 @@ int PSaxCharactersFlush (void *ctx, struct CBuffer *buffer) {
 
     CBufferPurge(buffer);
 
-    return PSaxCharactersDispatch(ctx, ch, len);
+    ret = PSaxCharactersDispatch(ctx, ch, len);
+    xmlFree(ch);
+    return ret;
 }
 
 int PSaxCharacters (void *ctx, const xmlChar * ch, int len) {
