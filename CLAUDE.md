@@ -105,6 +105,10 @@ See the wiki for full tables:
 - Avoid `unless`, `until` — use `if !` / `if not`
 - Avoid trailing statement modifiers
 
+### XS code (`LibXML.xs`, `Devel.xs`)
+- Comments **between XSUB definitions** (XS top level) must use `#` line comments, not C-style `/* */`. `xsubpp` parses lines starting with ` *` as function-definition attempts and fails with `Cannot parse function definition`. C-style comments are only safe inside `CODE:` / `PREINIT:` blocks and in the C preamble before the first `MODULE =` line.
+- Always run `make` locally after editing `.xs` files — `xsubpp` errors are not caught by Perl syntax checks.
+
 ### General
 - External DTD/entity loading is disabled by default (security)
 
