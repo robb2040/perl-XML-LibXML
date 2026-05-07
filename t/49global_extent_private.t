@@ -4,13 +4,13 @@ use warnings;
 use Test::More;
 use XML::LibXML;
 
-if (XML::LibXML::LIBXML_VERSION() < 20627)
+if (XML::LibXML::LIBXML_VERSION() < 21100)
 {
-    plan skip_all => "skipping for libxml2 < 2.6.27";
+    plan skip_all => "skipping for libxml2 < 2.11.0";
 }
 else
 {
-    plan tests => 5;
+    plan tests => 7;
 }
 
 sub handler_private {
@@ -53,6 +53,16 @@ subtest "without handler, parse fails" => sub {
     ok($@, "error occurred without handler");
 };
 
+# TEST
+subtest "without handler, empty expansion" => sub {
+    plan tests => 2;
+    my $parser = XML::LibXML->new({ expand_entities => 1 });
+    my $doc;
+    eval { $doc = $parser->parse_string($xml); };
+    is($@ || '', '', "no error");
+    is($doc->findvalue('//a'), "", 'empty expansion');
+};
+
 XML::LibXML::externalEntityLoader(\&handler_global);
 
 # TEST
@@ -88,4 +98,14 @@ subtest "without any handler, parse fails again" => sub {
     my $parser = XML::LibXML->new({ expand_entities => 1, no_network => 1 });
     eval { $parser->parse_string($xml); };
     ok($@, "error occurred without handler");
+};
+
+# TEST
+subtest "without any handler, empty expansion again" => sub {
+    plan tests => 2;
+    my $parser = XML::LibXML->new({ expand_entities => 1 });
+    my $doc;
+    eval { $doc = $parser->parse_string($xml); };
+    is($@ || '', '', "no error");
+    is($doc->findvalue('//a'), "", 'empty expansion');
 };
