@@ -221,8 +221,3 @@ certainly related to a bug.
 
 If you find documentation bugs, please fix them in the `libxml.dbk` file, stored
 in the `docs` directory.
-
-
-# Known Issues
-
-The push-parser implementation causes memory leaks.
