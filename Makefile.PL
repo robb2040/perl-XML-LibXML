@@ -77,6 +77,15 @@ while (my ($k, $v) = each %xsbuild_concat) {
   $xsbuild{$k} = (defined($base_val) ? ($base_val . ' ' . $v) : $v);
 }
 
+# Strip bogus -L/lib entries that Alien::Base::Wrapper sometimes injects
+# (the directory does not exist on macOS and the linker warns about it).
+for my $key (qw(LDFLAGS LDDLFLAGS)) {
+  next if !defined $xsbuild{$key};
+  $xsbuild{$key} =~ s{(?:^|\s)\K-L/lib(?=\s|$)}{}g;
+  $xsbuild{$key} =~ s{\s+}{ }g;
+  $xsbuild{$key} =~ s{^\s+|\s+$}{}g;
+}
+
 my %WriteMakefileArgs = (
   "NAME" => "XML::LibXML",
   "DISTNAME" => "XML-LibXML",
