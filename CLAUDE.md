@@ -70,6 +70,28 @@ libxml2                           (system C library)
   - `HAVE_READER_SUPPORT` / `WITH_SERRORS` (>= 2.6.21) — Reader API, structured errors
 - **Threads:** optional support via `:threads_shared` import tag
 
+### libxml2 versions in the wild
+
+The same XML::LibXML build can behave very differently depending on the linked libxml2. Distros span a wide range:
+
+- **2.9.x** — RHEL 7–9, Ubuntu LTS up to 24.04, Debian 11–13, Alpine ≤ 3.16. Still the most common in production. RHEL 7 ELS pins 2.9.1 (2013); most others pin 2.9.10 / 2.9.13 / 2.9.14 with backported CVE fixes.
+- **2.10–2.13** — Fedora, Alpine 3.17–3.21, openSUSE Leap, RHEL 10, Debian sid.
+- **2.14–2.15** — Arch, FreeBSD/OpenBSD/NetBSD, Homebrew/MacPorts, openSUSE Tumbleweed, Ubuntu 26.04 dev.
+
+Notable upstream milestones (helpful when triaging bug reports):
+- **2.11.0** (2023-04) — major entity-expansion-attack hardening
+- **2.12.0** (2023-11) — quadratic-parsing fixes across the XML parser
+- **2.13.0** (2024-06) — reliable malloc-failure reporting in core code
+- **2.14.0** (2025-03) — full HTML5 tokenizer conformance
+
+Ask bug reporters for the linked libxml2 version: `perl -MXML::LibXML -E 'say XML::LibXML::LIBXML_DOTTED_VERSION'`. A failing test on RHEL 8 (2.9.7) is often a fixed-upstream bug, not an XML::LibXML bug.
+
+Quirk: Debian trixie's package version reads `2.12.7+really2.9.14` — the binary is actually **2.9.14**, not 2.12.x (Debian's "+really" downgrade convention). Repology and naive version checks will mislead.
+
+See the wiki for full tables:
+- [libxml2 release history](https://github.com/cpan-authors/XML-LibXML/wiki/libxml2-hist) — every upstream release 2016–present
+- [libxml2 distro versions](https://github.com/cpan-authors/XML-LibXML/wiki/libxml2-distro-versions) — per-distro shipped versions and lag
+
 ## Coding Conventions
 
 ### C code (from HACKING.txt)
