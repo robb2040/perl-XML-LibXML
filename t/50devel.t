@@ -9,6 +9,10 @@ use XML::LibXML::Devel qw(:all);
 
 $|=1;
 
+if (!XML::LibXML::Devel->can('mem_used')) {
+  plan skip_all => "libxml2 memory-tracking API unavailable (removed in 2.14, deprecated on Apple SDKs); XML::LibXML::Devel::mem_used() is not compiled in";
+}
+
 # Base line
 {
   my $doc = XML::LibXML::Document->new();

@@ -27,8 +27,12 @@ our %EXPORT_TAGS = ( 'all' => [ qw(
   refcnt_dec
   refcnt
   fix_owner
-  mem_used
 ) ] );
+
+# mem_used is only compiled in when the installed libxml2 supports the
+# legacy memory-tracking API (removed in 2.14, deprecated by Apple SDKs).
+push @{ $EXPORT_TAGS{'all'} }, 'mem_used'
+  if defined &XML::LibXML::Devel::mem_used;
 
 our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
 
