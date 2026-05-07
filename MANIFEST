@@ -9,7 +9,7 @@ LibXML.pod
 LibXML.xs
 MANIFEST
 Makefile.PL
-README
+README.md
 TODO
 debian/changelog
 debian/compat
