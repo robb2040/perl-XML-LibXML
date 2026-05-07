@@ -151,6 +151,7 @@ typedef enum {
 
 /* this should keep the default */
 static xmlExternalEntityLoader LibXML_old_ext_ent_loader = NULL;
+static xmlExternalEntityLoader LibXML_old_ext_ent_loader_global = NULL;
 
 /* global external entity loader */
 SV *EXTERNAL_ENTITY_LOADER_FUNC = (SV *)NULL;
@@ -1017,6 +1018,7 @@ LibXML_cleanup_parser() {
     if (EXTERNAL_ENTITY_LOADER_FUNC == NULL && LibXML_old_ext_ent_loader != NULL)
     {
         xmlSetExternalEntityLoader( (xmlExternalEntityLoader)LibXML_old_ext_ent_loader );
+        LibXML_old_ext_ent_loader = NULL;
     }
 }
 
@@ -2858,12 +2860,12 @@ _externalEntityLoader( loader )
                 }
                 EXTERNAL_ENTITY_LOADER_FUNC = newSVsv(loader);
 
-                if (LibXML_old_ext_ent_loader == NULL)
+                if (LibXML_old_ext_ent_loader_global == NULL)
                 {
-                    LibXML_old_ext_ent_loader = xmlGetExternalEntityLoader();
+                    LibXML_old_ext_ent_loader_global = xmlGetExternalEntityLoader();
+                    xmlSetExternalEntityLoader(
+                        (xmlExternalEntityLoader)LibXML_load_external_entity);
                 }
-                xmlSetExternalEntityLoader(
-                    (xmlExternalEntityLoader)LibXML_load_external_entity);
             }
             else
             {
@@ -2872,11 +2874,11 @@ _externalEntityLoader( loader )
                     SvREFCNT_dec(EXTERNAL_ENTITY_LOADER_FUNC);
                     EXTERNAL_ENTITY_LOADER_FUNC = NULL;
                 }
-                if (LibXML_old_ext_ent_loader != NULL)
+                if (LibXML_old_ext_ent_loader_global != NULL)
                 {
                     xmlSetExternalEntityLoader(
-                        (xmlExternalEntityLoader)LibXML_old_ext_ent_loader);
-                    LibXML_old_ext_ent_loader = NULL;
+                        (xmlExternalEntityLoader)LibXML_old_ext_ent_loader_global);
+                    LibXML_old_ext_ent_loader_global = NULL;
                 }
             }
         }
