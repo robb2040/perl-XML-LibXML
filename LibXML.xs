@@ -1417,7 +1417,11 @@ LibXML_generic_extension_function(xmlXPathParserContextPtr ctxt, int nargs)
         default:
             warn("Unknown XPath return type (%d) in call to {%s}%s - assuming string", obj->type, uri, function);
             XPUSHs(sv_2mortal(newSVpv("XML::LibXML::Literal", 0)));
-            XPUSHs(sv_2mortal(C2Sv(xmlXPathCastToString(obj), 0)));
+            {
+                xmlChar *str = xmlXPathCastToString(obj);
+                XPUSHs(sv_2mortal(C2Sv(str, 0)));
+                xmlFree(str);
+            }
         }
         xmlXPathFreeObject(obj);
     }
@@ -2778,12 +2782,16 @@ load_catalog( self, filename )
         const char * fn = (const char *) Sv2C(filename, NULL);
     INIT:
         if ( fn == NULL || xmlStrlen( (xmlChar *)fn ) == 0 ) {
+            if ( fn != NULL )
+                xmlFree( (xmlChar *)fn );
             croak( "cannot load catalog" );
         }
     CODE:
 #ifdef LIBXML_CATALOG_ENABLED
         RETVAL = xmlLoadCatalog( fn );
+        xmlFree( (xmlChar *)fn );
 #else
+        xmlFree( (xmlChar *)fn );
         XSRETURN_UNDEF;
 #endif
     OUTPUT:
@@ -3075,6 +3083,8 @@ URI( self )
         RETVAL = (const char*)xmlStrdup(self->URL );
     OUTPUT:
         RETVAL
+    CLEANUP:
+        xmlFree((xmlChar*)RETVAL);
 
 void
 setURI( self, new_URI )
@@ -3617,12 +3627,12 @@ createAttributeNS( self, URI, pname, pvalue=&PL_sv_undef )
                 }
             }
             else {
-                croak( "can't create a new namespace on an attribute!" );
+                xmlFree(nsURI);
                 xmlFree(name);
                 if ( value ) {
                     xmlFree(value);
                 }
-                XSRETURN_UNDEF;
+                croak( "can't create a new namespace on an attribute!" );
             }
         }
         else {
@@ -4340,6 +4350,8 @@ lookupNamespacePrefix( self, svuri )
             }
         }
         else {
+            if ( href != NULL )
+                xmlFree( href );
             XSRETURN_UNDEF;
         }
     OUTPUT:
@@ -5202,6 +5214,7 @@ setBaseURI( self, URI )
         uri = nodeSv2C( URI, self );
         if ( uri != NULL ) {
             xmlNodeSetBase( self, uri );
+            xmlFree( uri );
         }
 
 SV*
@@ -5319,6 +5332,7 @@ _toStringC14N(self, comments=0, xpath=&PL_sv_undef, exclusive=0, inc_prefix_list
 	    if (SvOK(xpath_context)) {
 	      child_ctxt = INT2PTR(xmlXPathContextPtr,SvIV(SvRV(xpath_context)));
 	      if ( child_ctxt == NULL ) {
+		xmlFree( nodepath );
 		croak("XPathContext: missing xpath context\n");
 	      }
 	    } else {
@@ -5521,6 +5535,7 @@ _find( pnode, pxpath, to_bool )
                     XPUSHs(sv_2mortal(C2Sv(found->stringval, NULL)));
                     break;
                 default:
+                    xmlXPathFreeObject(found);
                     croak("Unknown XPath return type");
             }
             xmlXPathFreeObject(found);
@@ -5738,6 +5753,8 @@ _setNamespace(self, namespaceURI, namespacePrefix = &PL_sv_undef, flag = 1 )
         xmlNsPtr ns = NULL;
     INIT:
         if ( node == NULL ) {
+            if ( nsURI != NULL )
+                xmlFree( nsURI );
             croak( "lost node" );
         }
     CODE:
@@ -8273,6 +8290,7 @@ _find( pxpath_context, pxpath, to_bool )
                     XPUSHs(sv_2mortal(C2Sv(found->stringval, NULL)));
                     break;
                 default:
+                    xmlXPathFreeObject(found);
                     croak("Unknown XPath return type");
             }
             xmlXPathFreeObject(found);
@@ -8326,6 +8344,9 @@ _newForIO(CLASS, fh, url, encoding, options)
         RETVAL = xmlReaderForIO((xmlInputReadCallback) LibXML_read_perl,
 				(xmlInputCloseCallback) LibXML_close_perl,
 				(void *) fh, url, encoding, options);
+        if (RETVAL == NULL) {
+            SvREFCNT_dec(fh);
+        }
 	INIT_READER_ERROR_HANDLER(RETVAL)
     OUTPUT:
 	RETVAL
