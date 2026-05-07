@@ -101,8 +101,11 @@ my %WriteMakefileArgs = (
     'resources' => {
       repository => {
         type => 'git',
-        url  => 'https://github.com/shlomif/perl-XML-LibXML.git',
-        web  => 'https://github.com/shlomif/perl-XML-LibXML',
+        url  => 'https://github.com/cpan-authors/XML-LibXML.git',
+        web  => 'https://github.com/cpan-authors/XML-LibXML',
+      },
+      bugtracker => {
+        web => 'https://github.com/cpan-authors/XML-LibXML/issues',
       },
     },
     'keywords' => [
