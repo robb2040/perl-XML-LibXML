@@ -274,7 +274,7 @@ jobs:
             pkg-config --modversion libxml-2.0 2>/dev/null || xml2-config --version 2>/dev/null || true
             curl -L https://cpanmin.us | sudo perl - --notest --installdeps --with-configure .
             perl Makefile.PL
-            make -j$(sysctl -n hw.ncpu 2>/dev/null || echo 2)
+            make
             prove -wlvmb t
 
   fedora:
@@ -360,6 +360,6 @@ jobs:
       - name: perl Makefile.PL
         run: perl Makefile.PL
       - name: make
-        run: make -j$env:NUMBER_OF_PROCESSORS
+        run: make
       - name: Run Tests
         run: make test
